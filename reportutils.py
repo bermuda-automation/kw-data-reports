@@ -119,7 +119,7 @@ def filter_year_interval(df, starting_year, final_year):
     return df
 
         
-def filter_location(df, indicator, periods, year_from, year_to):
+def filter_location(df, indicator, period, year_from, year_to):
     """
     filters data depending on location.
     
@@ -202,13 +202,13 @@ def filter_indicator_and_period(df, indicator, period):
         # TODO: handle failure if indicator does not map in dictionary (key does not exist)
         filtered_dataframe = df.groupby([period])["price"].agg(indicator_dict[indicator])
         
-        if ("nr" in indicator):
+        if ("nr" in indicator): # it is a "number of sales".
             # these numbers will be relatively small (10 - 100) or (10,000 - 700,000)
             return last_sale_this_year, filtered_dataframe
         else:
             # return sales values in millions of dollars
-            # as these will be big numbers
-            return last_sale_this_year, filtered_dataframe/1000000
+            # as these will be big numbers (divide by 1E6)
+            return last_sale_this_year, filtered_dataframe/1_000_000
         
         
     elif period == "year_over_year":
@@ -264,36 +264,6 @@ def filter_indicator_and_period(df, indicator, period):
     else:
         "Period not available.\n"
         return df
-#     elif period == "year_to_year": 
-#         # year/previous_year
-#         filtered_dataframe = df.groupby(["year"])["price"].agg(indicator_dict[indicator])        
-#         yty["by_year"] = filtered_dataframe.copy()
-#         yty["shifted"] = filtered_dataframe.shift(periods=1, axis="rows")
-#         yty_percentages = yty["by_year"]/yty["shifted"]*100
-        
-#         # This gives us the right percentage ratios, but the last one for the running year (2022) 
-#         # is flawed We are comparing an entire year (2021) with sales from Jan2022 - Today2022.
-#         # To compare them properly, we can compare the subsets of year-to-date.  
-#         # This would have to be done before aggregation.
-        
-#         year_to_date = df["year"].max()
-
-#         this_jan_string = f"{year_to_date}-01-01"
-#         last_jan_string = f"{year_to_date-1}-01-01"
-
-#         sales_this_year = df[df.index > this_jan_string]
-        
-#         last_sale_this_year = sales_this_year.index.max() 
-#         last_sale_a_year_ago = f"{last_sale_this_year.year}-{last_sale_this_year.month}-{last_sale_this_year.day}"
-
-
-#         sales_last_year = df[(df.index > last_jan_string) & (df.index < last_sale_a_year_ago)]
-#         indicator_to_today_last_year = sales_last_year.price.agg(indicator_dict[indicator])
-#         indicator_to_today = sales_this_year.price.agg(indicator_dict[indicator])
-        
-#         # edit the previous dataframe with the specifics of this year
-#         yty_percentages.at[year_to_date] = 100*(indicator_to_today/indicator_to_today_last_year)        
-#         return yty_percentages
 
 
 def nr_of_decimals(x):
@@ -514,12 +484,12 @@ def create_bar_chart(df, last_sale, my_title, my_ylabel, period):
         disclaimer_str = ""
         
 
-    plt.figure(figsize=(8, 5))
+    # plt.figure(figsize=(10, 5))
     
-    fig = plt.figure()
+    fig = plt.figure(figsize=(10,5))
     ax = fig.add_axes([0,0,1,1])
     
-    plt.bar(df.index, df.values, color=my_colours)
+    plt.bar(df.index, df.values, 0.4, color=my_colours)
     plt.grid(color='#95a5a6', linestyle='--', linewidth=1, axis='y', alpha=0.5)
     # put disclaimer about data on top of last column
     if period == "year" or period == "year_over_year":
@@ -527,7 +497,7 @@ def create_bar_chart(df, last_sale, my_title, my_ylabel, period):
         # values for x-axis
         ax.set_xticks(df.index)
         # labels for x-axis
-        ax.set_xticklabels([str(yr) for yr in list(df.index)])
+        ax.set_xticklabels([str(yr) for yr in list(df.index)], fontsize=10)
         if period == "year_over_year":
             # labels for x-axis showing which years are compared
             yoy_ticks = make_year_over_year_tick_labels(df)
