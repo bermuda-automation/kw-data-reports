@@ -369,7 +369,7 @@ def create_graph_labels(indicator, period, location, property_type, bracket):
     
     if location == "Bermuda":
         location_label = ""
-    else:
+    else: # by_parish => By Parish, by_region => By Region
         location_label = " ".join([x.capitalize() for x in location.split("_")])
     
     if property_type == "all":
