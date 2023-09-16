@@ -11,7 +11,7 @@ def import_sales_data(file_location):
     df = pd.read_csv(file_location)
 
     # change date column to datetime object
-    df['date'] = pd.to_datetime(df['registration_date'], infer_datetime_format=True)
+    df['date'] = pd.to_datetime(df['registration_date'])
     # make the index a datetimeindex
     df.set_index(df["date"],inplace=True)
     
@@ -382,21 +382,17 @@ def create_graph_labels(indicator, period, location, property_type, bracket):
     else:
         bracket_label = ""
         
-    title = "Python 3 {3}, {2}, and {1} {0}".format("Python", "3", "string", "format")
     if bracket and property_type_label:
         title = "{} {} ({} {}) {}".format(period_label, indicator_label, 
-                                        bracket, property_type_label, location_label)
+                                        bracket_label, property_type_label, location_label)
     elif property_type_label and location_label and (not bracket):
         title = "{} {} - {} in {}".format(period_label,  indicator_label, property_type_label, location_label)
     elif property_type_label and (not location_label) and (not bracket):
         title = "{} {} --- {}".format(period_label,  indicator_label, property_type_label, location_label)
     
     else:
-        title = "{} {}, {} {}".format(period_label,  indicator_label, bracket, property_type_label, location_label)  
+        title = "{} {}, {} {}".format(period_label,  indicator_label, bracket_label, property_type_label, location_label)  
         
-    
-        periods = ["year", "year_to_date", "year_over_year", 
-           "quarter", "quarter_over_quarter", "quarter_to_quarter" ]
     if period == "year" or period == "quarter":
         y_axis_label = indicator_label
     elif period == "year_over_year":
