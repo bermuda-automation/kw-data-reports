@@ -10,10 +10,16 @@ import seaborn as sns; sns.set()
 def import_sales_data(file_location):
     df = pd.read_csv(file_location)
 
-    # change date column to datetime object
-    df['date'] = pd.to_datetime(df['registration_date'])
-    # make the index a datetimeindex
-    df.set_index(df["date"],inplace=True)
+    if "transaction_date" in df.columns:
+        # change date column to datetime object
+        df['date'] = pd.to_datetime(df['transaction_date'])
+        # make the index a datetimeindex
+        df.set_index(df["date"],inplace=True)
+    else:
+        # change date column to datetime object
+        df['date'] = pd.to_datetime(df['registration_date'])
+        # make the index a datetimeindex
+        df.set_index(df["date"],inplace=True)
     
     # add a column showing the year (for plotting)
     df['year'] = df.index.year
@@ -102,10 +108,10 @@ def filter_year_interval(df, starting_year, final_year):
     year_today = datetime.today().year
     
     # sanity check:
-    if starting_year < 2018:
-        print("No data available before 2018.\
+    if starting_year < 2016:
+        print("No data available before 2016.\
         \nStarting year set to 2018")
-        starting_year = 2018
+        starting_year = 2016
     elif final_year > year_today:
         final_year_msg = f"Sorry. No time travelling from the future allowed.\
               \nSetting Final Year to {year_today}"
